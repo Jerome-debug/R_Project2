@@ -1,0 +1,867 @@
+---
+title: "Kira_Plastinina_Research"
+author: "Bundi Kirimi"
+date: "1/30/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+#Installing packages.
+```{r}
+#install.packages("devtools")
+
+#install_github("vqv/ggbiplot")
+#install.packages("rtools")
+#install.packages("DataExplorer") 
+#install.packages("Hmisc")
+#install.packages("pastecs")
+#install.packages("psych")
+#install.packages("corrplot")
+#install.packages("factoextra")
+#install.packages("caret")
+```
+
+#Loading the libraries
+````{r}
+#specify the path where the file is located
+library("data.table")
+library(tidyverse)
+library(magrittr)
+library(warn = -1)
+library("ggbiplot")
+library(ggplot2)
+library(lattice)
+library(corrplot)
+library(DataExplorer)
+library(pastecs)
+library(psych)
+library(factoextra)
+library(caret)
+
+````
+
+#Loading the data
+```{r}
+
+
+library("data.table")
+library("readr")
+
+
+data <- read.csv("http://bit.ly/EcommerceCustomersDataset")
+head(data)
+
+df <- data.frame(data)
+head(df)
+```
+
+#Previewing the summary of the dataset
+```{r}
+summary(df)
+```
+
+#Checking the data
+```{r}
+#Length
+length(df)
+```
+The dataframe has 18 columns
+
+
+````{r}
+#Dimensions
+dim(df)
+
+````
+
+
+
+
+#The dataframe has 12330 row entries and 18 columns
+Column Names
+```{r}
+colnames(df)
+
+```
+
+Column data types
+
+```{r}
+sapply(df, class)
+```
+
+
+
+
+#Data Cleaning
+
+```{r}
+is.na(df)
+any(is.na(df))
+```
+
+
+```{r}
+#Missing Values
+sum(is.na(df))
+```
+
+#Columns with missing values
+```{r}
+#Checking the sum of missing values per column
+colSums(is.na(df))
+```
+
+
+```{r}
+#Duplicates
+duplicated_rows <- df[duplicated(df),]
+dim(duplicated_rows)
+
+```
+Removing duplicates
+```{r}
+new_df <- df[-which(duplicated(df)), ]
+dim(new_df)
+```
+#Data Types
+```{r}
+
+sapply(new_df, class)
+```
+
+#Univariate Analysis
+##Administrative
+```{r}
+unique(new_df$Administrative)
+
+
+```
+
+
+
+```{r}
+factor(unique(new_df$Administrative))
+```
+#There are 27 levels [27 unique elements in the Administrative column
+
+There are 14 missing values in this column thus we shall use the mean/mode to impute.
+Before performing any analysis on the column we have to drop the missing values
+
+```{r}
+length(new_df$Administrative)
+
+
+dim(new_df)
+
+
+sum(is.na(new_df))
+```
+
+#there are 96 missing values in the new_market_df dataframe
+
+
+```{r}
+df2 <- new_df[-which(is.na(new_df)), ]
+sum(is.na(df2))
+
+
+dim(df2)
+
+colSums(is.na(df2))
+
+```
+
+
+```{r}
+
+summary(df2$Administrative)
+
+
+```
+
+
+```{r}
+#each of the values printed below appear thrice in the dataset
+#distribution
+hist(df2$Administrative, col=c("darkorange"))
+```
+The adm distribution is right skewed.
+The highest value in the administrative column is 27
+The lowest value in the column is zero and it has the highest frequency.
+The mean is 2.34
+
+
+##Administrative_Duration
+```{r}
+length(unique(df2$Administrative_Duration))
+
+```
+
+
+```{r}
+summary(df2$Administrative_Duration)
+```
+
+
+```{r}
+#distribution
+hist(df2$Administrative_Duration, col=c("orange"))
+
+```
+
+The adm_duration distribution is right skewed.
+The highest value in the administrative column is 3398.75
+The lowest value in the column is 0 and it has the highest frequency.
+The mean is 81.68
+
+#Informational
+```{r}
+length(unique(df2$Informational))
+
+#there are 17 unique elements in Informational column
+summary(df2$Informational)
+
+```
+
+
+```{r}
+#distribution
+hist(df2$Informational,breaks = 16 , main="With breaks=16", col=c("Orange"))
+
+```
+Informational_Duration
+```{r}
+
+length(unique(df2$Informational_Duration))
+
+#there are 1259 unique elements in Informational duration column
+
+summary(df2$Informational_Duration)
+
+
+```
+
+
+```{r}
+
+#distribution
+hist(df2$Informational_Duration,col=c("Orange"))
+
+
+```
+
+
+
+ProductRelated
+```{r}
+length(unique(df2$ProductRelated))
+
+#there are 311 unique elements in Product Related  column
+
+summary(df2$ProductRelated)
+
+
+```
+
+```{r}
+
+#distribution
+hist(df2$ProductRelated,col=c("Orange"))
+
+
+```
+
+ProductRelated Duration
+```{r}
+length(unique(df2$ProductRelated_Duration))
+
+#there are 311 unique elements in Product Related  column
+
+summary(df2$ProductRelated_Duration)
+
+
+```
+
+```{r}
+
+#distribution
+hist(df2$ProductRelated_Duration,col=c("Orange"))
+
+
+```
+Bounce Rates
+```{r}
+length(unique(df2$BounceRates))
+
+#there are 311 unique elements in Product Related  column
+
+summary(df2$BounceRates)
+
+
+```
+
+```{r}
+
+#distribution
+hist(df2$BounceRates,col=c("Orange"))
+
+
+
+```
+
+Exit Rates
+```{r}
+length(unique(df2$ExitRates))
+
+#there are 311 unique elements in Product Related  column
+
+summary(df2$ExitRates)
+
+
+```
+
+```{r}
+
+#distribution
+hist(df2$ExitRates,col=c("Orange"))
+
+
+
+```
+Page Values
+```{r}
+length(unique(df2$PageValues))
+
+#there are 311 unique elements in Product Related  column
+
+summary(df2$PageValues)
+
+
+```
+
+```{r}
+
+#distribution
+hist(df2$PageValues,col=c("Orange"))
+
+
+
+```
+
+
+Special Days
+```{r}
+length(unique(df2$SpecialDay))
+
+#there are 311 unique elements in Product Related  column
+
+summary(df2$SpecialDay)
+
+
+```
+
+```{r}
+
+#distribution
+hist(df2$SpecialDay,col=c("Orange"))
+
+
+
+```
+Month
+```{r}
+length(unique(df2$Month))
+
+#there are 311 unique elements in Product Related  column
+
+summary(df2$Month)
+
+
+```
+
+```{r}
+summary(df2$Month)
+
+## Aug Dec Feb Jul June Mar May Nov Oct Sep 
+## 433 1706 182 432 285 1853 3328 2983 549 448
+adm_Month <- df2$Month
+
+
+```
+
+```{r}
+# Simple Bar Plot
+counts <- table(adm_Month)
+
+counts
+
+```
+
+```{r}
+barplot(counts, main="Distribution per month",col=c("brown"),
+ xlab="Months")
+
+```
+
+
+OperatingSystems
+
+```{r}
+
+length(unique(df2$OperatingSystems))
+
+
+summary(df2$OperatingSystems)
+```
+
+```{r}
+
+#distribution
+hist(df2$OperatingSystems,col=c("Orange"))
+
+
+
+```
+
+```{r}
+
+length(unique(df2$Browser))
+
+
+summary(df2$Browser)
+```
+
+```{r}
+
+#distribution
+hist(df2$Browser,col=c("Orange"))
+
+
+
+```
+```{r}
+
+length(unique(df2$Region))
+
+
+summary(df2$Region)
+```
+
+```{r}
+
+#distribution
+hist(df2$Region,col=c("Orange"))
+
+
+
+```
+
+```{r}
+
+length(unique(df2$TrafficType))
+
+
+summary(df2$TrafficType)
+```
+
+```{r}
+
+#distribution
+hist(df2$TrafficType,col=c("Orange"))
+
+```
+
+```{r}
+
+length(unique(df2$VisitorType))
+
+
+summary(df2$VisitorType)
+```
+
+```{r}
+adm_VisitorType <- df2$VisitorType
+
+#sort(adm_info_dur)
+names(table(adm_VisitorType))[table(adm_VisitorType)==max(table(adm_VisitorType ))]
+```
+
+
+```{r}
+
+#distribution
+counts <- table(adm_VisitorType)
+barplot(counts, main="Distribution of Visitor Type",col=c("brown"),
+ xlab="Visitor Type")
+
+```
+```{r}
+
+length(unique(df2$Weekend))
+
+
+summary(df2$Weekend)
+```
+
+```{r}
+adm_Weekend <- df2$Weekend
+
+#sort(adm_info_dur)
+names(table(adm_Weekend))[table(adm_Weekend)==max(table(adm_Weekend ))]
+```
+
+
+```{r}
+
+#distribution
+counts <- table(adm_Weekend)
+barplot(counts, main="Distribution of Weekends",col=c("brown"),
+ xlab="Weekend")
+
+```
+
+
+```{r}
+
+length(unique(df2$Revenue))
+
+
+summary(df2$Revenue)
+```
+
+```{r}
+adm_Revenue <- df2$Revenue
+
+#sort(adm_info_dur)
+names(table(adm_Revenue))[table(adm_Revenue)==max(table(adm_Revenue ))]
+```
+
+
+```{r}
+
+#distribution
+counts <- table(adm_Revenue)
+barplot(counts, main="Distribution of Revenue",col=c("brown"),
+ xlab="Revenue")
+
+
+```
+Bivariate Analysis
+
+````{r}
+# calculate correlations
+correlations <- cor(df2[,1:10])
+correlations
+```
+Correlation Plot
+
+```{r}
+
+# create correlation plot
+library(corrplot)
+## corrplot 0.84 loaded
+corrplot(correlations, method="square")
+
+
+```
+
+From the plot above, we can see that most of the variables have low Positive and Negative 
+correlation
+Pair Plots
+
+```{r}
+pairs(df2[,1:10])
+
+
+```
+
+Sites Visited Duration
+Scatter plot of Administrative_Duration vs Informational_Duration
+
+
+```{r}
+library(ggplot2)
+ggplot(df2, aes(x = Administrative_Duration, y =
+Informational_Duration)) +
+ geom_point(size = 2, color= "brown", shape = 23)+
+ geom_smooth(method=lm, linetype="dashed",color="darkred", 
+fill="blue")+
+ labs(title = "Scatter plot of Info Duration vs Adm Duration")
+
+```
+
+There is a positive non-linear correlation between the time spent on the Administrative site 
+and the Informational site
+
+Scatter plot Bounce vs Exit Rates Scatter Plot
+```{r}
+plot(ExitRates ~ BounceRates, dat = df2, 
+ col = "brown",
+ main = "Bounce vs Exit Rates Scatter Plot")
+
+```
+
+Stacked bar chart: Revenue vs Day Type
+```{r}
+
+library(magrittr)
+df2 %>%
+ ggplot(aes(Revenue)) +
+ geom_bar(aes(fill = Weekend))+
+ labs(title = "Stacked Chart: Revenue by Day Type")
+
+
+```
+we can see that most of the revenue is generated during the week 
+and not over the weekend
+
+Revenue vs Month
+```{r}
+# Stacked bar chart: Revenue vs Month
+df2 %>%
+ ggplot(aes(Revenue)) +
+ geom_bar(aes(fill = Month))+
+ labs(title = "Stacked Chart: Revenue by Month")
+
+```
+Type of visitor
+Stacked bar chart: Visitor Type vs Month
+
+```{r}
+df2 %>%
+ ggplot(aes(Month)) +
+ geom_bar(aes(fill = VisitorType))+
+ labs(title = "Stacked Chart: Visitor Type by Month")
+
+```
+
+Multivariate Analysis
+
+```{r}
+# A glimpse of the data
+library(dplyr)
+
+glimpse(df2)
+
+
+```
+
+Performing one hot encoding
+```{r}
+# One hot encoding of the factor variables.
+library(caret)
+## Loading required package: lattice
+dmy <- dummyVars(" ~ .", data = df2)
+dummy_df <- data.frame(predict(dmy, newdata = df2))
+#print(dummy_df)
+glimpse(dummy_df)
+
+```
+Checking the datatypes
+
+```{r}
+sapply(dummy_df, class)
+
+```
+
+Seperating the dependent and independent variables
+#removing the revenue column from the data
+#we select all the column indexes before 30
+
+
+```{r}
+dummy_df2 <- dummy_df[, -c(30:31)]
+dim(dummy_df2)
+```
+
+```{r}
+dummy_df.class<- df2[, "Revenue"]
+
+```
+
+SCALING VS NORMALIZATION
+
+
+Normalizing
+Normalization is a technique often applied to change the values of numeric columns in the 
+dataset to a common scale, without distorting differences in the ranges of values.
+```{r}
+
+dummy_df2_norm <- as.data.frame(apply(dummy_df2, 2, function(x) (x -
+min(x))/(max(x)-min(x))))
+summary(dummy_df2_norm)
+
+
+```
+```{r}
+#library("FactoMineR")
+#library("factoextra")
+
+#distance <- get_dist(dummy_df2_norm)
+#fviz_dist(distance, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4E07"))
+
+```
+The normalized dataset has a smaller range for the values which are between 0 and 1 
+unlike the standardized dataset which has values ranging from -5 to 19
+Finding the Optimal number of clusters
+Elbow method
+```{r}
+# Searching for the optimal number of clusters
+# # Elbow method
+# Searching for the optimal number of clusters
+# # Elbow method
+#library("factoextra")
+#ibrary("FactoMineR")
+
+#fviz_nbclust(dummy_df2_norm, kmeans, method = "wss") +
+ #geom_vline(xintercept = 4, linetype = 2)+
+ #labs(subtitle = "Elbow method")
+
+
+```
+Implement the Solution
+K-MEANS CLUSTERING
+
+
+```{r}
+outputk <- kmeans(dummy_df2_norm, 4)
+
+# Previewing the number of records in each cluster
+outputk$size
+```
+
+
+The cluster center datapoints Per attribute
+```{r}
+outputk$centers
+
+```
+
+
+Visualising the clusters of the whole dataset
+```{r}
+options(repr.plot.width = 11, repr.plot.height = 6)
+fviz_cluster(outputk, dummy_df2_norm)
+```
+
+Visualizing variable datatypes on a scatter plot
+```{r}
+plot(dummy_df2_norm[, 5:6], col = outputk$cluster)
+```
+
+HIERACHICAL CLUSTERING
+
+
+```{r}
+d <- dist(dummy_df2_norm, method = "euclidean")
+# We then apply hierarchical clustering using the Ward's method
+res.hc <- hclust(d, method = "ward.D2")
+# Lastly we plot the obtained dendrogram
+#--
+plot(res.hc, cex = 0.6, hang = -1)
+```
+
+
+
+Challenging the Solution
+PCA
+
+```{r}
+library(ggbiplot)
+## Loading required package: plyr
+
+pca_residual = prcomp(dummy_df2_norm, scale = T, center = T)
+# Visualising the pca results
+options(repr.plot.width = 6, repr.plot.height = 6)
+ggbiplot(pca_residual) +
+ labs(title = 'Explained variance plot')
+
+```
+
+
+Dummify the variables
+```{r}
+
+# Applying PCA
+# We pass df_norm to the prcomp().
+# We also set two arguments, center and scale,
+# to be TRUE then preview our object with summary
+dummy_PCA <- prcomp(dummy_df2_norm,
+ center = TRUE,
+ scale = FALSE)
+summary(dummy_PCA)
+
+```
+
+
+```{r}
+#The Principal Components and how well they explain the variance
+
+var <- get_pca_var(pca_residual)
+head(var$contrib, 9)
+
+
+```
+
+Correlation Cirlce
+```{r}
+
+fviz_pca_var(pca_residual, col.var = "cos2",
+ gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+ repel = TRUE # Avoid text overlapping
+ )
+```
+From the Correlation Circle and PCA we can see that the most important components are
+Administrative #site
+Administrative_Duration #Time spent on the admin site
+Informational #site
+Product Related #site
+Product Related Duration #Time spent on the Product related site
+Bounce Rates #metric
+Exit Rates #metric
+Page Values #metric
+
+
+
+SCREE PLOT
+```{r}
+fviz_eig(pca_residual, barfill = 'cyan',linecolor = 'red' )
+
+```
+
+From the plot above, the elbow forms in between the 7th and 8th dimensions. This
+indicates that the analysis should yield 7 factors.
+The first 7 principal components explain about 76% of the variance in the data
+
+Challenging the solution
+Using a different number of clusters 9 clusters using the silhouette method
+K-MEANS CLUSTERING
+```{r}
+
+outputs <- kmeans(dummy_df2_norm, 9)
+
+# Previewing the number of records in each cluster
+outputs$size
+## [1] 273 2221 2377 1167 1676 1025 502 1165 1793
+#Visualising the clusters of the whole dataset
+options(repr.plot.width = 11, repr.plot.height = 6)
+fviz_cluster(outputs, dummy_df2_norm)
+```
+Summary
+Compasiron Between K-MEANS and HIERACHICAL clustering From the Analysis, we can
+identify that:
+1. K-means Cluster Analysis performs much better in identyfing patterns as compared to
+Hierrachical clustering.
+2. Since the dataset is large, visualizing hierrachical clusters is abit cumbersome as
+compared to K-means clustering.
+3. K-means clustering yields better reults using the optimal number of clusters which can
+be determined by Elbow and Silhouette Methods
+
+
+
